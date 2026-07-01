@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rico Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F5F3EE;
+    --ink: #1B1B1D;
+    --amber: #E2A53D;
+    --coral: #E2574C;
+    --blue: #4C8FE2;
+    --line: #E3DFD4;
+    --muted: #6B6E72;
+    --muted2: #9A9C9F;
+    --sand: #EAE6DA;
+    --sage: #5B7065;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+  }
+  .display{ font-family:'Archivo Black', sans-serif; }
+
+  /* ---- header ---- */
+  header{
+    background:var(--ink);
+    color:var(--paper);
+    padding:32px 24px;
+  }
+  .wrap{ max-width:880px; margin:0 auto; }
+  .eyebrow{
+    display:flex; align-items:center; gap:8px;
+    color:var(--amber);
+    font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.18em;
+    margin-bottom:12px;
+  }
+  h1{
+    font-size:30px;
+    line-height:1.15;
+    margin:0 0 8px;
+  }
+  .brand{
+    font-size:42px;
+    line-height:1;
+    margin:0 0 10px;
+    letter-spacing:.01em;
+    background: linear-gradient(135deg, #F4C661 0%, var(--coral) 38%, var(--blue) 72%, var(--sage) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.35),
+      2px 2px 0 rgba(0,0,0,0.30),
+      3px 3px 0 rgba(0,0,0,0.25),
+      4px 4px 0 rgba(0,0,0,0.20),
+      5px 5px 8px rgba(0,0,0,0.35);
+    display:inline-block;
+  }
+  @media (max-width:480px){
+    .brand{ font-size:32px; }
+  }
+  header p{
+    color:var(--muted2);
+    font-size:14px;
+    max-width:460px;
+    margin:0;
+    line-height:1.5;
+  }
+  .progress-row{
+    margin-top:24px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .progress-track{
+    flex:1;
+    height:8px;
+    border-radius:999px;
+    background:#3A3D42;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--amber), var(--coral), var(--blue));
+    width:0%;
+    transition:width .25s ease;
+  }
+  .progress-label{
+    font-size:12px;
+    color:var(--muted2);
+    white-space:nowrap;
+  }
+
+  /* ---- day tabs ---- */
+  nav{
+    position:sticky; top:0; z-index:10;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:0 16px;
+    overflow-x:auto;
+  }
+  .tabs{
+    max-width:880px;
+    margin:0 auto;
+    display:flex;
+    gap:4px;
+    padding:12px 0;
+    min-width:max-content;
+  }
+  .tab{
+    position:relative;
+    width:64px;
+    padding:8px 0;
+    border:none;
+    background:none;
+    border-radius:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    cursor:pointer;
+    color:var(--muted);
+    font-family:inherit;
+  }
+  .tab:hover{ background:var(--sand); }
+  .tab.active{ background:var(--ink); color:var(--paper); }
+  .tab span.lbl{
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .tab .dot{
+    margin-top:6px;
+    width:6px; height:6px;
+    border-radius:999px;
+  }
+  .tab .check{
+    position:absolute; top:4px; right:4px;
+    color:var(--amber);
+  }
+  .dot-workout{ background:var(--amber); }
+  .dot-rest{ background:#3A3D42; }
+  .dot-active{ background:var(--sage); }
+
+  /* ---- main ---- */
+  main{ max-width:880px; margin:0 auto; padding:32px 24px; }
+  .day-head{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:16px; margin-bottom:24px; flex-wrap:wrap;
+  }
+  .day-head .label{
+    font-size:11px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.16em; color:var(--muted2); margin-bottom:4px;
+  }
+  .day-head h2{ font-size:26px; margin:0; }
+  .day-head .blurb{ color:var(--muted); font-size:14px; margin:4px 0 0; }
+  .day-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .duration{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+  .mark-btn{
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:600;
+    padding:6px 14px;
+    border-radius:999px;
+    border:1px solid var(--ink);
+    background:none;
+    color:var(--ink);
+    cursor:pointer;
+    font-family:inherit;
+    transition: background .15s, color .15s;
+  }
+  .mark-btn:hover{ background:var(--ink); color:var(--paper); }
+  .mark-btn.done{ background:var(--ink); color:var(--amber); }
+
+  .exercise-list{ display:flex; flex-direction:column; gap:20px; }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 280px 1fr;
+  }
+  @media (max-width:640px){
+    .card{ grid-template-columns:1fr; }
+  }
+  .thumb{
+    position:relative;
+    background:var(--ink);
+    min-height:160px;
+    display:block;
+    overflow:hidden;
+    text-decoration:none;
+  }
+  .thumb img{
+    width:100%; height:100%; object-fit:cover;
+    opacity:.9; transition:opacity .15s;
+    display:block;
+  }
+  .thumb:hover img{ opacity:.7; }
+  .play-btn{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .play-circle{
+    width:48px; height:48px; border-radius:999px;
+    background:var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px rgba(0,0,0,.3);
+    transition:transform .15s;
+  }
+  .thumb:hover .play-circle{ transform:scale(1.1); }
+  .yt-tag{
+    position:absolute; bottom:8px; right:8px;
+    font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
+    color:#fff; background:rgba(0,0,0,.6);
+    padding:4px 8px; border-radius:4px;
+  }
+  .card-body{ padding:20px; display:flex; flex-direction:column; }
+  .target-tag{
+    display:flex; align-items:center; gap:8px;
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    color:var(--amber); margin-bottom:6px;
+  }
+  .num-badge{
+    width:20px; height:20px; border-radius:999px;
+    background:var(--ink); color:var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px;
+  }
+  .ex-name{ font-size:17px; margin:0 0 4px; }
+  .ex-sets{ font-size:14px; font-weight:600; margin:0 0 10px; }
+  .ex-tip{ font-size:13.5px; color:var(--muted); line-height:1.5; margin:0; }
+
+  .note-box{
+    background:var(--sand);
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:13.5px;
+    color:#5B5E62;
+    display:flex; gap:10px; align-items:flex-start;
+    margin-top:8px;
+  }
+
+  .rest-card{
+    border-radius:16px;
+    padding:36px 24px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:14px;
+    color:var(--paper);
+  }
+  .rest-card.rest{ background:var(--ink); }
+  .rest-card.active-day{ background:var(--sage); }
+  .rest-card p{
+    max-width:420px; font-size:14px; line-height:1.6; color:#D6D8DA; margin:0;
+  }
+  .next-btn{
+    display:flex; align-items:center; gap:4px;
+    background:none; border:none; cursor:pointer;
+    color:var(--amber); font-size:12px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.04em;
+    font-family:inherit; margin-top:4px;
+  }
+  .next-btn:hover{ color:var(--paper); }
+
+  footer{ max-width:880px; margin:0 auto; padding:8px 24px 40px; }
+  footer p{ font-size:12px; color:var(--muted2); line-height:1.6; }
+
+  svg{ display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5 17.5 17.5M14.5 4.5l5 5M4.5 14.5l5 5M2 8l3-3M19 22l3-3M2.5 6.5l1.5-1.5M20 17.5l1.5-1.5"/></svg>
+      Beginner Gym Program
+    </div>
+    <h1 class="display brand">RICO COACH</h1>
+    <p>5 training days, 2 rest days a week. Every exercise has a short video — watch it before you load up weight.</p>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-label" id="progressLabel">0/5 sessions done</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="tabs" id="tabs"></div>
+</nav>
+
+<main id="main"></main>
+
+<footer>
+  <p>Start lighter than you think you need to — focus on learning the movement first, then add weight week by week. If anything causes sharp pain, stop and ask a trainer to check your form.</p>
+</footer>
+
+<script>
+const DAYS = [
+  {
+    id: "mon", label: "Mon", full: "Monday", type: "workout",
+    title: "Push Day", blurb: "Chest · Shoulders · Triceps", duration: "40–45 min",
+    exercises: [
+      { name: "Push-Up (knee or incline okay)", sets: "3 sets × 6–10 reps", target: "Chest · Triceps", video: "uXC_3Gs9Yr0", tip: "Body in one straight line. Lower until your chest nearly touches the floor, then press up." },
+      { name: "Chest Press Machine", sets: "3 sets × 10–12 reps", target: "Chest · Triceps", video: "rY0B8UFdne0", tip: "Set the seat so the handles line up with your chest. Press forward without locking your elbows hard at the end." },
+      { name: "Shoulder Press Machine", sets: "3 sets × 8–10 reps", target: "Shoulders · Triceps", video: "BAZkFGeUy5U", tip: "Set the seat so the handles start level with your shoulders. Press straight up, don't arch your back." },
+      { name: "Tricep Pushdown (Cable)", sets: "3 sets × 10–12 reps", target: "Triceps", video: "2-LAMcpzODU", tip: "Keep your elbows pinned to your sides the whole time — only your forearms should move." },
+    ],
+  },
+  {
+    id: "tue", label: "Tue", full: "Tuesday", type: "workout",
+    title: "Leg Day A", blurb: "Quads · Glutes · Hamstrings", duration: "40–45 min",
+    exercises: [
+      { name: "Bodyweight / Goblet Squat", sets: "3 sets × 10–12 reps", target: "Quads · Glutes", video: "otzWCWpuW-A", tip: "Sit back like you're reaching for a chair. Knees track over your toes, chest stays tall." },
+      { name: "Leg Press Machine", sets: "3 sets × 10–12 reps", target: "Quads · Glutes", video: "UYdx6ammdwU", tip: "Feet shoulder-width on the platform. Lower with control, don't let your knees cave in." },
+      { name: "Leg Extension Machine", sets: "3 sets × 10–12 reps", target: "Quads", video: "2lvdnQg04PM", tip: "Knees in line with the machine's pivot point. Extend fully, pause, then lower with control." },
+      { name: "Dumbbell Glute Bridge", sets: "3 sets × 12–15 reps", target: "Glutes · Hamstrings", video: "PSMW7iSi2BU", tip: "Drive through your heels and squeeze your glutes hard at the top for a full second." },
+    ],
+  },
+  {
+    id: "wed", label: "Wed", full: "Wednesday", type: "rest",
+    title: "Rest Day", blurb: "Recovery — this is part of the program, not a day off from it",
+    note: "Your muscles grow during rest, not during the workout. A relaxed 20–30 min walk is great if you feel like moving, but it's optional.",
+  },
+  {
+    id: "thu", label: "Thu", full: "Thursday", type: "workout",
+    title: "Pull Day", blurb: "Back · Biceps", duration: "40–45 min",
+    exercises: [
+      { name: "Lat Pulldown Machine", sets: "3 sets × 10–12 reps", target: "Back · Biceps", video: "csqD8VpyLuk", tip: "Pull the bar to your upper chest by driving your elbows down, not by leaning back." },
+      { name: "Seated Cable Row", sets: "3 sets × 10–12 reps", target: "Back · Biceps", video: "xQNrFHEMhI4", tip: "Pull with your elbows, not your hands. Squeeze your shoulder blades together at the finish." },
+      { name: "Dumbbell Row", sets: "3 sets × 10–12 reps per arm", target: "Back · Biceps", video: "yJ8NTl5RaTk", tip: "Flat back, pull the dumbbell toward your hip, lead with your elbow." },
+      { name: "Dumbbell Bicep Curl", sets: "3 sets × 10–12 reps", target: "Biceps", video: "6DeLZ6cbgWQ", tip: "Keep your elbows pinned to your sides. Curl up slowly, squeeze, then lower just as slowly." },
+    ],
+  },
+  {
+    id: "fri", label: "Fri", full: "Friday", type: "workout",
+    title: "Leg Day B", blurb: "Glutes · Hamstrings · Balance", duration: "40–45 min",
+    exercises: [
+      { name: "Dumbbell Lunge", sets: "3 sets × 8–10 reps per leg", target: "Quads · Glutes · Balance", video: "9gglI77Kzq8", tip: "Step forward, drop the back knee straight down. Push through the front heel to stand back up." },
+      { name: "Leg Curl Machine", sets: "3 sets × 10–12 reps", target: "Hamstrings", video: "MAbThtU8Sis", tip: "Curl your heels toward your glutes with control, pause, then let the weight back down slowly." },
+      { name: "Dumbbell Glute Bridge", sets: "3 sets × 12–15 reps", target: "Glutes · Hamstrings", video: "PSMW7iSi2BU", tip: "Same cue as Tuesday — drive through your heels and squeeze hard at the top." },
+      { name: "Plank", sets: "3 sets × 20–30 sec hold", target: "Core", video: "ASdvN_XEl_c", tip: "Straight line from head to heels. Don't let your hips sag or pike up." },
+    ],
+  },
+  {
+    id: "sat", label: "Sat", full: "Saturday", type: "workout",
+    title: "Full Body + Core", blurb: "Squat · Push · Pull · Core", duration: "40–45 min",
+    exercises: [
+      { name: "Bodyweight / Goblet Squat", sets: "3 sets × 10–12 reps", target: "Quads · Glutes", video: "otzWCWpuW-A", tip: "Last squats of the week — by now the movement should be starting to feel automatic." },
+      { name: "Push-Up (knee or incline okay)", sets: "3 sets × 6–10 reps", target: "Chest · Triceps", video: "uXC_3Gs9Yr0", tip: "Body in one straight line. Lower until your chest nearly touches the floor, then press up." },
+      { name: "Dumbbell Row", sets: "3 sets × 10–12 reps per arm", target: "Back · Biceps", video: "yJ8NTl5RaTk", tip: "Flat back, pull the dumbbell toward your hip, lead with your elbow." },
+      { name: "Plank", sets: "3 sets × 20–30 sec hold", target: "Core", video: "ASdvN_XEl_c", tip: "Squeeze your glutes and brace your core like someone's about to poke your stomach." },
+    ],
+  },
+  {
+    id: "sun", label: "Sun", full: "Sunday", type: "rest",
+    title: "Rest Day", blurb: "Full recovery before next week's Push Day",
+    note: "Take the full day off training. You'll come back to Monday stronger for it.",
+  },
+];
+
+const ICONS = {
+  check: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>',
+  checkBtn: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>',
+  clock: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  play: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>',
+  flame: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0011 17a2.5 2.5 0 002.5-2.5c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7.5 7.5 0 11-15 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>',
+  moon: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>',
+  flameBig: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0011 17a2.5 2.5 0 002.5-2.5c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7.5 7.5 0 11-15 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>',
+  chevron: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>',
+};
+
+const DOT_CLASS = { workout: "dot-workout", rest: "dot-rest", active: "dot-active" };
+
+let activeDay = "mon";
+let completed = {};
+
+function totalWorkouts(){ return DAYS.filter(d => d.type === "workout").length; }
+function doneWorkouts(){ return DAYS.filter(d => d.type === "workout" && completed[d.id]).length; }
+
+function renderTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = DAYS.map(d => `
+    <button class="tab ${d.id === activeDay ? 'active' : ''}" data-day="${d.id}">
+      <span class="lbl">${d.label}</span>
+      <span class="dot ${DOT_CLASS[d.type]}"></span>
+      ${completed[d.id] ? `<span class="check">${ICONS.check}</span>` : ""}
+    </button>
+  `).join("");
+  tabs.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeDay = btn.dataset.day;
+      renderAll();
+    });
+  });
+}
+
+function renderProgress(){
+  const pct = (doneWorkouts() / totalWorkouts()) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = `${doneWorkouts()}/${totalWorkouts()} sessions done`;
+}
+
+function renderMain(){
+  const day = DAYS.find(d => d.id === activeDay);
+  const main = document.getElementById("main");
+
+  let headHtml = `
+    <div class="day-head">
+      <div>
+        <div class="label">${day.full}</div>
+        <h2 class="display">${day.title}</h2>
+        <p class="blurb">${day.blurb}</p>
+      </div>
+      ${day.type === "workout" ? `
+        <div class="day-meta">
+          <div class="duration">${ICONS.clock} ${day.duration}</div>
+          <button class="mark-btn ${completed[day.id] ? 'done' : ''}" id="markBtn">
+            ${ICONS.checkBtn} ${completed[day.id] ? "Completed" : "Mark done"}
+          </button>
+        </div>` : ""}
+    </div>
+  `;
+
+  let bodyHtml = "";
+  if (day.type === "workout") {
+    bodyHtml = `
+      <div class="exercise-list">
+        ${day.exercises.map((ex, i) => `
+          <div class="card">
+            <a class="thumb" href="https://www.youtube.com/watch?v=${ex.video}" target="_blank" rel="noopener noreferrer">
+              <img src="https://img.youtube.com/vi/${ex.video}/hqdefault.jpg" alt="${ex.name} video thumbnail" loading="lazy">
+              <div class="play-btn"><div class="play-circle">${ICONS.play}</div></div>
+              <div class="yt-tag">Watch on YouTube</div>
+            </a>
+            <div class="card-body">
+              <div class="target-tag"><span class="num-badge">${i + 1}</span>${ex.target}</div>
+              <h3 class="ex-name display" style="font-family:'Inter',sans-serif;font-weight:700;">${ex.name}</h3>
+              <p class="ex-sets">${ex.sets}</p>
+              <p class="ex-tip">${ex.tip}</p>
+            </div>
+          </div>
+        `).join("")}
+        <div class="note-box">${ICONS.flame}<span>New to these machines? Ask a staff member to set the seat height and pin weight for you the first time — it takes 30 seconds and saves you guessing.</span></div>
+      </div>
+    `;
+  } else {
+    const isRest = day.type === "rest";
+    bodyHtml = `
+      <div class="rest-card ${isRest ? 'rest' : 'active-day'}">
+        ${isRest ? ICONS.moon : ICONS.flameBig}
+        <p>${day.note}</p>
+        <button class="next-btn" id="nextBtn">Next day ${ICONS.chevron}</button>
+      </div>
+    `;
+  }
+
+  main.innerHTML = headHtml + bodyHtml;
+
+  const markBtn = document.getElementById("markBtn");
+  if (markBtn) {
+    markBtn.addEventListener("click", () => {
+      completed[day.id] = !completed[day.id];
+      renderAll();
+    });
+  }
+  const nextBtn = document.getElementById("nextBtn");
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const idx = DAYS.findIndex(d => d.id === activeDay);
+      activeDay = DAYS[(idx + 1) % DAYS.length].id;
+      renderAll();
+    });
+  }
+}
+
+function renderAll(){
+  renderTabs();
+  renderProgress();
+  renderMain();
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
